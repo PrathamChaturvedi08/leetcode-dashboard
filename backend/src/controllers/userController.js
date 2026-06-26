@@ -1,5 +1,7 @@
 const User = require("../models/User");
 
+const { getProfile } = require("../services/leetcodeService");
+
 exports.connectLeetCode = async (req, res) => {
   try {
     const { leetcodeUsername } = req.body;
@@ -38,6 +40,29 @@ exports.connectLeetCode = async (req, res) => {
         leetcodeUsername: req.user.leetcodeUsername,
         avatar: req.user.avatar,
       },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.syncProfile = async (req, res) => {
+  try {
+    if (!req.user.leetcodeUsername) {
+      return res.status(400).json({
+        success: false,
+        message: "Connect your LeetCode account first.",
+      });
+    }
+
+    const profile = await getProfile(req.user.leetcodeUsername);
+
+    res.status(200).json({
+      success: true,
+      profile,
     });
   } catch (error) {
     res.status(500).json({
