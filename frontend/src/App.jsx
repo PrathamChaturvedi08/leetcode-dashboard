@@ -1,40 +1,20 @@
-import { Routes, Route } from "react-router-dom";
-
-import DashboardLayout from "./layouts/DashboardLayout";
-
-import ProtectedRoute from "./routes/ProtectedRoute";
-
-import Login from "./pages/Login";
-
-import Register from "./pages/Register";
-
-import Dashboard from "./pages/Dashboard";
-
-import Profile from "./pages/Profile";
-
-import Compare from "./pages/Compare";
+import Button from "./components/ui/Button";
+import Card from "./components/ui/Card";
+import Input from "./components/ui/Input";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 p-8">
+      <Card className="w-full max-w-md space-y-6">
+        <h1 className="text-3xl font-bold">CodePulse</h1>
 
-      <Route path="/register" element={<Register />} />
+        <Input label="Email" placeholder="Enter your email" />
 
-      <Route
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Input label="Password" type="password" placeholder="Password" />
 
-        <Route path="/profile" element={<Profile />} />
-
-        <Route path="/compare" element={<Compare />} />
-      </Route>
-    </Routes>
+        <Button className="w-full">Login</Button>
+      </Card>
+    </div>
   );
 }
 
