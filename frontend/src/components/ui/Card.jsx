@@ -1,7 +1,16 @@
 const Card = ({ children, className = "" }) => {
   return (
     <div
-      className={`rounded-2xl border border-slate-800 bg-slate-900 p-6 ${className}`}
+      className={`
+        rounded-2xl
+        border
+        border-slate-800
+        bg-slate-900
+        p-8
+        shadow-xl
+        shadow-black/20
+        ${className}
+      `}
     >
       {children}
     </div>

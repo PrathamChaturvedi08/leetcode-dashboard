@@ -1,39 +1,36 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 
 import { getToken, saveToken, removeToken } from "../services/tokenService";
-
 import { getUser, saveUser, removeUser } from "../services/storageService";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(() => getToken());
 
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    setToken(getToken());
-
-    setUser(getUser());
-  }, []);
+  const [user, setUser] = useState(() => getUser());
 
   const login = (token, user) => {
-    saveToken(token);
+    const safeUser = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      leetcodeUsername: user.leetcodeUsername,
+    };
 
-    saveUser(user);
+    saveToken(token);
+    saveUser(safeUser);
 
     setToken(token);
-
-    setUser(user);
+    setUser(safeUser);
   };
 
   const logout = () => {
     removeToken();
-
     removeUser();
 
     setToken(null);
-
     setUser(null);
   };
 
@@ -52,4 +49,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export { AuthContext };

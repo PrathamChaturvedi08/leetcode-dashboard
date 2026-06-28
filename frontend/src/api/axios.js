@@ -2,12 +2,15 @@ import axios from "axios";
 
 import { API_BASE_URL } from "../constants/api";
 
+import { getToken, removeToken } from "../services/tokenService";
+import { removeUser } from "../services/storageService";
+
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -15,5 +18,18 @@ axiosInstance.interceptors.request.use((config) => {
 
   return config;
 });
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+
+  (error) => {
+    if (error.response?.status === 401) {
+      removeToken();
+      removeUser();
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 export default axiosInstance;

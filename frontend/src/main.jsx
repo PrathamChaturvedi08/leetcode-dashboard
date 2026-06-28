@@ -9,13 +9,29 @@ import "./index.css";
 
 import { AuthProvider } from "./context/AuthContext";
 
-const queryClient = new QueryClient();
+import { Toaster } from "react-hot-toast";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+            }}
+          />
+
           <App />
         </AuthProvider>
       </BrowserRouter>

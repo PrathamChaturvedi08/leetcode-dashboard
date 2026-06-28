@@ -1,20 +1,36 @@
-import Button from "./components/ui/Button";
-import Card from "./components/ui/Card";
-import Input from "./components/ui/Input";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+import AuthLayout from "./layouts/AuthLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
+
+import ProtectedRoute from "./routes/ProtectedRoute";
+
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 p-8">
-      <Card className="w-full max-w-md space-y-6">
-        <h1 className="text-3xl font-bold">CodePulse</h1>
+    <Routes>
+      {/* Authentication */}
 
-        <Input label="Email" placeholder="Enter your email" />
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
 
-        <Input label="Password" type="password" placeholder="Password" />
+      {/* Protected */}
 
-        <Button className="w-full">Login</Button>
-      </Card>
-    </div>
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+      </Route>
+
+      {/* Default */}
+
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 
