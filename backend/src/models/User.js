@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
 
     leetcodeUsername: {
       type: String,
+      default: null,
       unique: true,
       sparse: true,
       trim: true,
@@ -32,31 +33,6 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: "",
-    },
-
-    ranking: {
-      type: Number,
-      default: 0,
-    },
-
-    totalSolved: {
-      type: Number,
-      default: 0,
-    },
-
-    easySolved: {
-      type: Number,
-      default: 0,
-    },
-
-    mediumSolved: {
-      type: Number,
-      default: 0,
-    },
-
-    hardSolved: {
-      type: Number,
-      default: 0,
     },
 
     lastSynced: {

@@ -1,7 +1,5 @@
 const User = require("../models/User");
 
-const { getProfile } = require("../services/leetcodeService");
-
 exports.connectLeetCode = async (req, res) => {
   try {
     const { leetcodeUsername } = req.body;
@@ -15,54 +13,28 @@ exports.connectLeetCode = async (req, res) => {
 
     const existingUser = await User.findOne({
       leetcodeUsername,
-      _id: { $ne: req.user._id },
     });
 
-    if (existingUser) {
+    if (
+      existingUser &&
+      existingUser._id.toString() !== req.user._id.toString()
+    ) {
       return res.status(400).json({
         success: false,
-        message:
-          "This LeetCode username is already connected to another account.",
+        message: "This LeetCode username is already linked.",
       });
     }
 
-    req.user.leetcodeUsername = leetcodeUsername;
+    const user = await User.findById(req.user._id);
 
-    await req.user.save();
+    user.leetcodeUsername = leetcodeUsername;
 
-    res.status(200).json({
+    await user.save();
+
+    res.json({
       success: true,
       message: "LeetCode account connected successfully.",
-      user: {
-        _id: req.user._id,
-        name: req.user.name,
-        email: req.user.email,
-        leetcodeUsername: req.user.leetcodeUsername,
-        avatar: req.user.avatar,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-exports.syncProfile = async (req, res) => {
-  try {
-    if (!req.user.leetcodeUsername) {
-      return res.status(400).json({
-        success: false,
-        message: "Connect your LeetCode account first.",
-      });
-    }
-
-    const profile = await getProfile(req.user.leetcodeUsername);
-
-    res.status(200).json({
-      success: true,
-      profile,
+      leetcodeUsername: user.leetcodeUsername,
     });
   } catch (error) {
     res.status(500).json({
