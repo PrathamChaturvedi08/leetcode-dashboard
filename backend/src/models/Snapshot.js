@@ -39,6 +39,11 @@ const snapshotSchema = new mongoose.Schema(
       default: 0,
     },
 
+    contestTopPercentage: {
+      type: Number,
+      default: 0,
+    },
+
     totalSolved: {
       type: Number,
       default: 0,
@@ -62,6 +67,9 @@ const snapshotSchema = new mongoose.Schema(
     skillStats: [
       {
         tagName: String,
+
+        tagSlug: String,
+
         problemsSolved: Number,
       },
     ],

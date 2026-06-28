@@ -2,25 +2,25 @@ const graphqlClient = require("../../../utils/graphqlClient");
 const PROFILE_QUERY = require("./queries/profileQuery");
 
 const getSolvedCount = (stats, difficulty) => {
-  return (
-    stats.find((item) => item.difficulty === difficulty)?.count || 0
-  );
+  return stats.find((item) => item.difficulty === difficulty)?.count || 0;
+};
+
+const getAcceptedSubmissions = (stats, difficulty) => {
+  return stats.find((item) => item.difficulty === difficulty)?.submissions || 0;
 };
 
 const getBeatsStats = (stats) => ({
-  easy:
-    stats.find((item) => item.difficulty === "Easy")?.percentage || 0,
+  easy: stats.find((item) => item.difficulty === "EASY")?.percentage || 0,
 
-  medium:
-    stats.find((item) => item.difficulty === "Medium")?.percentage || 0,
+  medium: stats.find((item) => item.difficulty === "MEDIUM")?.percentage || 0,
 
-  hard:
-    stats.find((item) => item.difficulty === "Hard")?.percentage || 0,
+  hard: stats.find((item) => item.difficulty === "HARD")?.percentage || 0,
 });
 
 const getProfile = async (username) => {
   const data = await graphqlClient(PROFILE_QUERY, {
     username,
+    userSlug: username,
   });
 
   const user = data.matchedUser;
@@ -29,7 +29,7 @@ const getProfile = async (username) => {
     throw new Error("LeetCode user not found.");
   }
 
-  const stats = user.submitStatsGlobal.acSubmissionNum;
+  const stats = user.submitStats.acSubmissionNum;
 
   return {
     avatar: user.profile.userAvatar,
@@ -48,16 +48,32 @@ const getProfile = async (username) => {
 
     hardSolved: getSolvedCount(stats, "Hard"),
 
-    badges:
-      user.badges?.map((badge) => ({
-        name: badge.displayName,
-        icon: badge.icon,
+    acceptedSubmissions: {
+      total: getAcceptedSubmissions(stats, "All"),
+
+      easy: getAcceptedSubmissions(stats, "Easy"),
+
+      medium: getAcceptedSubmissions(stats, "Medium"),
+
+      hard: getAcceptedSubmissions(stats, "Hard"),
+    },
+
+    languageStats:
+      user.languageProblemCount?.map((language) => ({
+        languageName: language.languageName,
+        problemsSolved: language.problemsSolved,
       })) || [],
 
-    languageStats: user.languageProblemCount || [],
+    badges:
+      user.badges?.map((badge) => ({
+        id: badge.id,
+        displayName: badge.displayName,
+        icon: badge.icon,
+        category: badge.category,
+      })) || [],
 
     problemsSolvedBeatsStats: getBeatsStats(
-      user.problemsSolvedBeatsStats || [],
+      data.userProfileUserQuestionProgressV2?.userSessionBeatsPercentage || [],
     ),
   };
 };

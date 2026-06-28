@@ -13,6 +13,8 @@ const getContestData = async (username) => {
       contestRating: 0,
       contestRanking: 0,
       contestAttended: 0,
+      contestTopPercentage: 0,
+      contestBadge: null,
     };
   }
 
@@ -22,6 +24,10 @@ const getContestData = async (username) => {
     contestRanking: contest.globalRanking || 0,
 
     contestAttended: contest.attendedContestsCount || 0,
+
+    contestTopPercentage: contest.topPercentage || 0,
+
+    contestBadge: contest.badge?.name || null,
   };
 };
 

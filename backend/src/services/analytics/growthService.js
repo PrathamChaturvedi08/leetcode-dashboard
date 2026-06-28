@@ -76,28 +76,10 @@ const getActiveDays = (calendar) => {
   return Object.keys(calendar).length;
 };
 
-const getConsistencyScore = (calendar) => {
-  const activeDays = getActiveDays(calendar);
-
-  const today = new Date();
-
-  const startOfYear = new Date(today.getFullYear(), 0, 1);
-
-  const totalDays = differenceInCalendarDays(today, startOfYear) + 1;
-
-  return Math.round((activeDays / totalDays) * 100);
-};
-
-const getDifficultyScore = (profile) => {
-  return profile.easySolved + profile.mediumSolved * 2 + profile.hardSolved * 3;
-};
-
 module.exports = {
   getSubmissionDates,
   getCurrentStreak,
   getLongestStreak,
   getTotalSubmissions,
   getActiveDays,
-  getConsistencyScore,
-  getDifficultyScore,
 };

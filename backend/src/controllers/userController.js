@@ -43,3 +43,26 @@ exports.connectLeetCode = async (req, res) => {
     });
   }
 };
+
+const CurrentSnapshot = require("../models/CurrentSnapshot");
+
+exports.getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+
+    const currentSnapshot = await CurrentSnapshot.findOne({
+      user: req.user._id,
+    });
+
+    res.status(200).json({
+      success: true,
+      user,
+      currentSnapshot,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

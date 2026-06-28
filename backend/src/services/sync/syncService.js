@@ -10,14 +10,14 @@ const { getContestData } = require("../providers/leetcode/contestProvider");
 
 const { getCalendar } = require("../providers/leetcode/calendarProvider");
 
+const { getSkillStats } = require("../providers/leetcode/skillProvider");
+
 const {
   getSubmissionDates,
   getCurrentStreak,
   getLongestStreak,
   getTotalSubmissions,
   getActiveDays,
-  getConsistencyScore,
-  getDifficultyScore,
 } = require("../analytics/growthService");
 
 /*
@@ -49,6 +49,8 @@ const archiveSnapshotIfNeeded = async (currentSnapshot) => {
 
     contestAttended: currentSnapshot.contestAttended,
 
+    contestTopPercentage: currentSnapshot.contestTopPercentage,
+
     totalSolved: currentSnapshot.totalSolved,
 
     easySolved: currentSnapshot.easySolved,
@@ -74,7 +76,13 @@ const archiveSnapshotIfNeeded = async (currentSnapshot) => {
 /*
  * Update or create the user's current snapshot.
  */
-const updateCurrentSnapshot = async (userId, profile, contest, calendar) => {
+const updateCurrentSnapshot = async (
+  userId,
+  profile,
+  contest,
+  calendar,
+  skillStats,
+) => {
   let snapshot = await CurrentSnapshot.findOne({
     user: userId,
   });
@@ -99,7 +107,7 @@ const updateCurrentSnapshot = async (userId, profile, contest, calendar) => {
 
   snapshot.languageStats = profile.languageStats;
 
-  snapshot.skillStats = [];
+  snapshot.skillStats = skillStats;
 
   snapshot.problemsSolvedBeatsStats = profile.problemsSolvedBeatsStats;
 
@@ -108,6 +116,8 @@ const updateCurrentSnapshot = async (userId, profile, contest, calendar) => {
   snapshot.contestRanking = contest.contestRanking;
 
   snapshot.contestAttended = contest.contestAttended;
+
+  snapshot.contestTopPercentage = contest.contestTopPercentage;
 
   snapshot.submissionCalendar = calendar.submissionCalendar;
 
@@ -141,33 +151,12 @@ const syncLeetCodeProfile = async (userId) => {
 
   const username = user.leetcodeUsername;
 
-  const [profileResult, contestResult, calendarResult] =
-    await Promise.allSettled([
-      getProfile(username),
-      getContestData(username),
-      getCalendar(username),
-    ]);
-
-  if (profileResult.status !== "fulfilled") {
-    throw profileResult.reason;
-  }
-
-  if (calendarResult.status !== "fulfilled") {
-    throw calendarResult.reason;
-  }
-
-  const profile = profileResult.value;
-
-  const calendar = calendarResult.value;
-
-  const contest =
-    contestResult.status === "fulfilled"
-      ? contestResult.value
-      : {
-          contestRating: 0,
-          contestRanking: 0,
-          contestAttended: 0,
-        };
+  const [profile, contest, calendar, skillStats] = await Promise.all([
+    getProfile(username),
+    getContestData(username),
+    getCalendar(username),
+    getSkillStats(username),
+  ]);
 
   const currentSnapshot = await CurrentSnapshot.findOne({
     user: userId,
@@ -180,11 +169,13 @@ const syncLeetCodeProfile = async (userId) => {
     profile,
     contest,
     calendar,
+    skillStats,
   );
 
-  user.avatar = profile.avatar;
-
-  user.lastSynced = new Date();
+  Object.assign(user, {
+    avatar: profile.avatar,
+    lastSynced: new Date(),
+  });
 
   await user.save();
 

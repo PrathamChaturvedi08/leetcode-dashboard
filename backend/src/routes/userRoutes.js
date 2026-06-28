@@ -4,8 +4,13 @@ const router = express.Router();
 
 const auth = require("../middleware/authMiddleware");
 
-const { connectLeetCode } = require("../controllers/userController");
+const {
+  connectLeetCode,
+  getMyProfile,
+} = require("../controllers/userController");
 
 router.patch("/leetcode", auth, connectLeetCode);
+
+router.get("/me", auth, getMyProfile);
 
 module.exports = router;

@@ -1,9 +1,15 @@
 const CONTEST_QUERY = `
-query userContestRanking($username: String!) {
+query userContestRankingInfo($username: String!) {
   userContestRanking(username: $username) {
+    attendedContestsCount
     rating
     globalRanking
-    attendedContestsCount
+    totalParticipants
+    topPercentage
+
+    badge {
+      name
+    }
   }
 }
 `;
