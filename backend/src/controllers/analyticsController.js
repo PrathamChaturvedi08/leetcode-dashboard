@@ -63,6 +63,8 @@ exports.getSummary = async (req, res) => {
       topicDistribution: getTopicDistribution(currentSnapshot.skillStats),
 
       languageDistribution: currentSnapshot.languageStats,
+
+      badges: currentSnapshot.badges,
     });
   } catch (error) {
     return res.status(500).json({
