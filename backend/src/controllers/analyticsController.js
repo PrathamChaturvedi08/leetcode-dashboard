@@ -61,6 +61,8 @@ exports.getSummary = async (req, res) => {
       weakestTopics: getWeakestTopics(currentSnapshot.skillStats),
 
       topicDistribution: getTopicDistribution(currentSnapshot.skillStats),
+
+      languageDistribution: currentSnapshot.languageStats,
     });
   } catch (error) {
     return res.status(500).json({
